@@ -1,0 +1,63 @@
+<div class="hero-slide-media hero__slide" id="node-id">
+
+    <script type="text/javascript">
+        window.onload = function(e) {
+            var preLoad = document.getElementById('loading');
+            if ((screen.width < 480) || (screen.height < 480)) {
+                document.getElementById("node-id").innerHTML=('<video webkit-playsinline muted autoplay playsinline src="URL" id="bgvid" poster ="URL" type="video/mp4"></video><div class="welcome-message"><p class="hero__subtitle">TEXT</p><h2 class="h1 hero__title">TEXT TEXT TEXT</h2><a class="btn hero__cta" href="URL">TEXT TEXT <span class="icon icon-arrow-right" aria-hidden="true"></span></a></div>');
+                var smvid = document.getElementById('bgvid');
+
+                smvid.addEventListener('loadstart', function(e) {
+                    //console.log('looking for video');
+                    preLoad.id = "loading";
+                });
+                smvid.addEventListener('loadeddata', function(e) {
+                    //console.log('loaded first frame');
+                    preLoad.id = "loaded";
+                });
+
+                var smvids = [
+                    "URL",
+                    "URL",
+                    "URL"
+                ];
+                var smactiveVideo = 0;
+                smvid.addEventListener('ended', function(e) {
+                    smactiveVideo = (++smactiveVideo) % smvids.length;
+                    smvid.src = smvids[smactiveVideo];
+                    smvid.play();
+                });
+            }
+            else {
+                document.getElementById("node-id").innerHTML=('<video muted autoplay src="URL" id="bgvid" poster ="URL" type="video/mp4"></video><div class="welcome-message"><p class="welcome-message">TEXT</p><h2 class="h1 hero__title">TEXT TEXT TEXT</h2><a class="btn hero__cta" href="URL">TEXT TEXT <span class="icon icon-arrow-right" aria-hidden="true"></span></a></div>');
+                var lgvid = document.getElementById('bgvid');
+
+                lgvid.addEventListener('loadstart', function(e) {
+                    //console.log('looking for video');
+                    preLoad.id = "loading";
+                });
+                lgvid.addEventListener('loadeddata', function(e) {
+                    //console.log('loaded first frame');
+                    preLoad.id = "loaded";
+                });
+
+                var lgactiveVideo = 0;
+                var lgvids = [
+                    "URL",
+                    "URL",
+                    "URL"
+                ];
+                lgvid.addEventListener('ended', function(e) {
+                    lgactiveVideo = (++lgactiveVideo) % lgvids.length;
+                    lgvid.src = lgvids[lgactiveVideo];
+                    lgvid.play();
+                });
+            };
+        };
+
+
+    </script>
+
+    <div id="loading"></div>
+
+</div>
