@@ -1,12 +1,11 @@
 <div class="hero-slide-media hero__slide" id="node-id">
-
     <script type="text/javascript">
         function fade(element, callBack) {
             var op = 1;
             var timer = setInterval(function() {
                 if(op <= 0.1) {
+                    op = 0;
                     clearInterval(timer);
-                    element.style.display = 'none';
                     setTimeout(callBack, 50);
                 }
                 element.style.opacity = op;
@@ -18,9 +17,7 @@
         function unfade(element, callBack) {
             var op = 0.1;
             element.style.opacity = 0;
-            element.style.display = 'block';
             var timer = setInterval(function() {
-                console.log(op);
                 if(op >= 1) {
                     clearInterval(timer);
                     setTimeout(callBack, 50);
@@ -33,9 +30,16 @@
 
         window.onload = function(e) {
             // videos:
-            var posterUrl = "https://cdn.shopify.com/s/files/1/2570/3070/files/047_RJP7207_6a638ddf-20a5-41c5-b4ef-2a81bb9d99b8.jpg?13766845966228802767";
+            var posterlgUrl = "https://cdn.shopify.com/s/files/1/2570/3070/files/047_RJP7207_6a638ddf-20a5-41c5-b4ef-2a81bb9d99b8.jpg?13766845966228802767";
+            var postersmUrl = "https://cdn.shopify.com/s/files/1/2570/3070/files/047_RJP7207_6a638ddf-20a5-41c5-b4ef-2a81bb9d99b8.jpg?13766845966228802767";
 
             var lgvids = [
+                "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-1-Mobile.mp4?10084847405532614363",
+                "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-2-Mobile.mp4?10084847405532614363",
+                "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-3-Mobile.mp4?10084847405532614363"
+            ];
+
+            var smvids = [
                 "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-1-Mobile.mp4?10084847405532614363",
                 "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-2-Mobile.mp4?10084847405532614363",
                 "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-3-Mobile.mp4?10084847405532614363"
@@ -46,37 +50,70 @@
             var hero_cta_url = "https://jontedesigns.com/collections/forget-me-not";
             var hero_cta_text = "View Collection";
 
-
-
-
             var preLoad = document.getElementById('loading');
-            if ((screen.width < 480) || (screen.height < 480)) {
-                document.getElementById("node-id").innerHTML=('<video webkit-playsinline muted autoplay playsinline src="URL" id="bgvid" poster ="URL" type="video/mp4"></video><div class="welcome-message"><p class="hero__subtitle">TEXT</p><h2 class="h1 hero__title">TEXT TEXT TEXT</h2><a class="btn hero__cta" href="URL">TEXT TEXT <span class="icon icon-arrow-right" aria-hidden="true"></span></a></div>');
-                var smvid = document.getElementById('bgvid');
+            if ((screen.width < 480) || (screen.height < 480)) {console.log("small");
+                var videoPlayers = '<div id="videoPlayersContainer" style="position: relative">';
+                for(var i = 0; i < smvids.length; i++) {
+                    var url = smvids[i];
+                    var videoTag = '';
+                    var videoType = '';
+                    if(url.toLowerCase().indexOf('.ogg') !== -1) {
+                        videoType = 'video/ogg';
+                    } else if(url.toLowerCase().indexOf('.webm') !== -1) {
+                        videoType = 'video/webm';
+                    } else if(url.toLowerCase().indexOf('.mp4') !== -1) {
+                        videoType = 'video/mp4';
+                    } else {
+                        continue;
+                    }
+                    videoPlayers = videoPlayers + '<video muted preload="auto" style="position: absolute; opacity: 0" src="' + url + '" class="smvid" type="' + videoType + '"></video>';
+                }
+                videoPlayers = videoPlayers + '</div>';
 
-                smvid.addEventListener('loadstart', function(e) {
-                    //console.log('looking for video');
-                    preLoad.id = "loading";
-                });
-                smvid.addEventListener('loadeddata', function(e) {
-                    //console.log('loaded first frame');
-                    preLoad.id = "loaded";
-                });
+                videoPlayers = videoPlayers + '<div class="welcome-message">';
+                videoPlayers = videoPlayers + '<p class="welcome-message">' + welcome_message + '</p>';
+                videoPlayers = videoPlayers + '<h2 class="h1 hero__title">' + hero_title + '</h2>';
+                videoPlayers = videoPlayers + '<a class="btn hero__cta" href="' + hero_cta_url + '">' + hero_cta_text + ' <span class="icon icon-arrow-right" aria-hidden="true"></span></a>';
+                video_players = videoPlayers + '</div>';
+                document.getElementById("node-id").innerHTML=(videoPlayers);
+                document.getElementById("videoPlayersContainer").style.backgroundImage = 'url(' + postersmUrl + ')';
+                var smvidplayers = document.getElementsByClassName('smvid');
 
-                var smvids = [
-                    "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-1-Mobile.mp4?10084847405532614363",
-                    "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-2-Mobile.mp4?10084847405532614363",
-                    "https://cdn.shopify.com/s/files/1/2570/3070/files/Segement-3-Mobile.mp4?10084847405532614363"
-                ];
                 var smactiveVideo = 0;
-                smvid.addEventListener('ended', function(e) {
-                    smactiveVideo = (++smactiveVideo) % smvids.length;
-                    smvid.src = smvids[smactiveVideo];
-                    smvid.play();
-                });
+
+                var notloaded = smvidplayers.length;
+                for(var i = 0; i < smvidplayers.length; i++) {
+                    smvidplayers[i].addEventListener('loadstart', function(e) {
+                        console.log('looking for video');
+                        preLoad.id = "loading";
+                    });
+
+                    smvidplayers[i].addEventListener('loadeddata', function(e) {
+                        console.log('loaded first frame');
+                        notloaded--;
+                        console.log(notloaded);
+                        if(notloaded == 0) {
+                            document.getElementById("videoPlayersContainer").style.height = smvidplayers[0].clientHeight;
+                            console.log(smvidplayers[0].clientHeight);
+                            preLoad.id = "loaded";
+                            unfade(smvidplayers[smactiveVideo], function () {
+                                smvidplayers[smactiveVideo].play();
+                            });
+                        }
+                    });
+
+                    smvidplayers[i].addEventListener('ended', function(e) {
+                        fade(smvidplayers[smactiveVideo], function () {
+                            smactiveVideo = (smactiveVideo + 1) % smvidplayers.length;
+                            unfade(smvidplayers[smactiveVideo], function () {
+                                smvidplayers[smactiveVideo].play();
+                            });
+                        });
+                    });
+                }
             }
             else {
-                var videoPlayers = "";
+                var videoPlayers = '<div id="videoPlayersContainer" style="position: relative">';
                 for(var i = 0; i < lgvids.length; i++) {
                     var url = lgvids[i];
                     var videoTag = '';
@@ -90,28 +127,40 @@
                     } else {
                         continue;
                     }
-                    videoPlayers = videoPlayers + '<video muted preload="auto" style="display: none" src="' + url + '" class="bgvid" type="' + videoType + '"></video>';
+                    videoPlayers = videoPlayers + '<video muted preload="auto" style="position: absolute; opacity: 0" src="' + url + '" class="bgvid" type="' + videoType + '"></video>';
                 }
+                videoPlayers = videoPlayers + '</div>';
+
                 videoPlayers = videoPlayers + '<div class="welcome-message">';
                 videoPlayers = videoPlayers + '<p class="welcome-message">' + welcome_message + '</p>';
                 videoPlayers = videoPlayers + '<h2 class="h1 hero__title">' + hero_title + '</h2>';
                 videoPlayers = videoPlayers + '<a class="btn hero__cta" href="' + hero_cta_url + '">' + hero_cta_text + ' <span class="icon icon-arrow-right" aria-hidden="true"></span></a>';
                 video_players = videoPlayers + '</div>';
                 document.getElementById("node-id").innerHTML=(videoPlayers);
-                document.getElementById("node-id").style.backgroundImage = 'url(' + posterUrl + ')';
+                document.getElementById("videoPlayersContainer").style.backgroundImage = 'url(' + posterlgUrl + ')';
                 var lgvidplayers = document.getElementsByClassName('bgvid');
 
                 var lgactiveVideo = 0;
 
+                var notloaded = lgvidplayers.length;
                 for(var i = 0; i < lgvidplayers.length; i++) {
                     lgvidplayers[i].addEventListener('loadstart', function(e) {
-                        //console.log('looking for video');
+                        console.log('looking for video');
                         preLoad.id = "loading";
                     });
 
                     lgvidplayers[i].addEventListener('loadeddata', function(e) {
-                        //console.log('loaded first frame');
-                        preLoad.id = "loaded";
+                        console.log('loaded first frame');
+                        notloaded--;
+                        console.log(notloaded);
+                        if(notloaded == 0) {
+                            document.getElementById("videoPlayersContainer").style.height = lgvidplayers[0].clientHeight;
+                            console.log(lgvidplayers[0].clientHeight);
+                            preLoad.id = "loaded";
+                            unfade(lgvidplayers[lgactiveVideo], function () {
+                                lgvidplayers[lgactiveVideo].play();
+                            });
+                        }
                     });
 
                     lgvidplayers[i].addEventListener('ended', function(e) {
@@ -123,9 +172,6 @@
                         });
                     });
                 }
-                unfade(lgvidplayers[lgactiveVideo], function () {
-                    lgvidplayers[lgactiveVideo].play();
-                })
             }
         };
 
